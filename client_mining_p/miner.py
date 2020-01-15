@@ -3,6 +3,7 @@ import requests
 
 import sys
 import json
+import time
 
 
 def proof_of_work(block):
@@ -15,8 +16,12 @@ def proof_of_work(block):
     """
     block_string = json.dumps(block)
     proof = 0
+    start_clock = time.time()
+    print('Checking for valid proof...')
     while valid_proof(block_string, proof) is False:
         proof += 1
+    end_clock = time.time()
+    print('Time elapsed: ', end_clock - start_clock, 'seconds')
     return proof
 
 def valid_proof(block_string, proof):
