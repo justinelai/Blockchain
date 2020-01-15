@@ -64,19 +64,19 @@ class Blockchain(object):
     def last_block(self):
         return self.chain[-1]
     
+    """
     @staticmethod
     def valid_proof(block_string, proof):
-        """
         :param block_string: <string> The stringified block to use to
         check in combination with `proof`
         :param proof: <int?> The value that when combined with the
         stringified previous block results in a hash that has the
         correct number of leading zeroes.
         :return: True if the resulting hash is a valid proof, False otherwise
-        """
         guess = f"{block_string}{proof}".encode()
         guess_hash = hashlib.sha256(guess).hexdigest()
         return guess_hash[:6] == "000000"
+    """
 
 # Instantiate our Node
 app = Flask(__name__)
@@ -98,7 +98,8 @@ def mine():
     }
         return jsonify(), 400
     
-    previous_hash = blockchain.hash(self.last_block)
+
+    previous_hash = blockchain.hash(blockchain.last_block)
     block = blockchain.new_block(data['proof'], previous_hash)
 
     response = {
