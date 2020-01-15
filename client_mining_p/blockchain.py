@@ -31,6 +31,13 @@ class Blockchain(object):
     def last_block(self):
         return self.chain[-1]
     
+    @staticmethod
+    def valid_proof(block_string, proof):
+        guess = f"{block_string}{proof}".encode()
+        guess_hash = hashlib.sha256(guess).hexdigest()
+        return guess_hash[:6] == "000000"
+
+    
 app = Flask(__name__)
 node_identifier = str(uuid4()).replace('-', '')
 blockchain = Blockchain()
@@ -61,18 +68,27 @@ def mine():
     if not all(r in data for r in required):
         response = {
         'message': 'Missing required fields'
-    }
+        }
         return jsonify(response), 400
 
-    # forge the new block
-    previous_hash = blockchain.hash(blockchain.last_block)
-    block = blockchain.new_block(data['proof'], previous_hash)
+    #  validate proof
+    last_string = json.dumps(blockchain.last_block, sort_keys=True)
+    valid = blockchain.valid_proof(last_string, data['proof'])
+    if valid:
 
-    response = {
-        'message': 'New Block Forged',
-        'block': block
-    }
-    return jsonify(response), 200
+        # forge the new block
+        previous_hash = blockchain.hash(blockchain.last_block)
+        block = blockchain.new_block(data['proof'], previous_hash)
+        response = {
+            'message': 'New Block Forged',
+            'block': block
+        }
+        return jsonify(response), 200
+    else: 
+        response = {
+            'message': 'Invalid proof!',
+        }
+        return jsonify(response), 200
 
 # Run the program on port 5000
 if __name__ == '__main__':

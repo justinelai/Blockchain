@@ -82,5 +82,4 @@ if __name__ == '__main__':
         if data['message'] == 'New Block Forged':
             coin_count += 1
             print('Number of coins mined: ' + str(coin_count))
-        else:
-            print(data['message'])
+        print(data['message'])
